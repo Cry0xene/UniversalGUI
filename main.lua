@@ -2309,3 +2309,5 @@ print("✅ Right Control to toggle")
 print("✅ Awesome UI with your profile picture")
 
 return UniversalFeatures
+MainGui.Enabled = true
+MainFrame.Visible = true
