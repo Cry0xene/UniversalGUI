@@ -1,23 +1,23 @@
--- Rayfield Loader for Universal GUI
+-- Universal GUI - Rayfield Edition
 -- Single line: loadstring(game:HttpGet('https://raw.githubusercontent.com/Cry0xene/UniversalGUI/main/rayfield_loader.lua'))()
 
-print("Universal GUI - Loading with Rayfield interface...")
+print("🔄 Loading Universal GUI with Rayfield...")
 
 -- Load Rayfield
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
--- Create a fake Mercury library for compatibility
-local fakeMercury = {}
+-- First, let's load your main script
+local mainScript = game:HttpGet('https://raw.githubusercontent.com/Cry0xene/UniversalGUI/main/main.lua')
 
--- Add themes
-fakeMercury.Themes = {
+-- Create a COMPATIBLE Mercury wrapper
+local Mercury = {}
+Mercury.Themes = {
     Dark = "Dark",
     Light = "Light"
 }
 
--- Create a Create function that works with Rayfield
-function fakeMercury:Create(options)
-    -- Actually create Rayfield window
+-- Create the main window
+function Mercury:Create(options)
     local window = Rayfield:CreateWindow({
         Name = options.Name or "Universal GUI",
         LoadingTitle = "Universal GUI",
@@ -27,77 +27,95 @@ function fakeMercury:Create(options)
             FolderName = "UniversalGUI",
             FileName = "Settings"
         },
-        Theme = options.Theme == fakeMercury.Themes.Dark and "Dark" or "Light",
+        Theme = options.Theme == "Dark" and "Dark" or "Light",
         Discord = {
             Enabled = false
         },
         KeySystem = false
     })
     
-    -- Store original window for method overriding
-    local originalWindow = window
-    
-    -- Create a wrapper with Mercury-like methods
-    local wrappedWindow = {}
-    
-    -- Tab creation
-    function wrappedWindow:Tab(options)
-        if type(options) == "table" then
-            return originalWindow:CreateTab(options.Name or "Tab", options.Icon)
+    -- Add Mercury-compatible methods
+    function window:Tab(tabOptions)
+        -- Handle both string and table input
+        if type(tabOptions) == "string" then
+            return window:CreateTab(tabOptions, nil)
         else
-            return originalWindow:CreateTab(options, nil)
+            return window:CreateTab(tabOptions.Name or "Tab", tabOptions.Icon)
         end
     end
     
-    -- For compatibility with :CreateTab syntax too
-    wrappedWindow.CreateTab = wrappedWindow.Tab
-    
-    -- ScrollingFrame for tabs
-    function wrappedWindow:ScrollingFrame(options)
-        -- Rayfield doesn't have direct ScrollingFrame, so we'll skip this
-        -- The main script will handle this differently
+    function window:ScrollingFrame(options)
+        -- Return a dummy scrolling frame
         return {
-            Add = function(self, child)
-                return child
-            end,
-            CanvasSize = UDim2.new(0, 0, 0, 0)
+            Size = options.Size or UDim2.new(1, 0, 1, 0),
+            CanvasSize = options.CanvasSize or UDim2.new(0, 0, 0, 0),
+            Add = function(self, childOptions)
+                -- Handle different element types
+                if childOptions.Type == "Frame" then
+                    local frame = {
+                        BackgroundTransparency = childOptions.BackgroundTransparency or 0,
+                        Size = childOptions.Size or UDim2.new(1, 0, 1, 0),
+                        Position = childOptions.Position or UDim2.new(0, 0, 0, 0),
+                        LayoutOrder = childOptions.LayoutOrder or 1
+                    }
+                    
+                    function frame:Label(labelOptions)
+                        return {
+                            Text = labelOptions.Text or "",
+                            Size = labelOptions.Size or UDim2.new(1, 0, 1, 0),
+                            Position = labelOptions.Position or UDim2.new(0, 0, 0, 0)
+                        }
+                    end
+                    
+                    function frame:Button(buttonOptions)
+                        local btn = {
+                            Text = buttonOptions.Text or "Button",
+                            Size = buttonOptions.Size or UDim2.new(1, 0, 1, 0),
+                            Position = buttonOptions.Position or UDim2.new(0, 0, 0, 0),
+                            Callback = buttonOptions.Callback or function() end
+                        }
+                        return btn
+                    end
+                    
+                    return frame
+                end
+                return {}
+            end
         }
     end
     
-    -- Notification
-    function wrappedWindow:Notification(options)
+    function window:Notification(notifOptions)
         Rayfield:Notify({
-            Title = options.Title or "Notification",
-            Content = options.Text or "",
-            Duration = options.Duration or 3,
+            Title = notifOptions.Title or "Notification",
+            Content = notifOptions.Text or "",
+            Duration = notifOptions.Duration or 3,
             Image = nil
         })
     end
     
-    return wrappedWindow
+    return window
 end
 
--- Set global variable before loading main script
-UniversalGUI = fakeMercury
+-- Set global variables BEFORE executing main script
+_G.UniversalGUI = Mercury
 
--- Now load your main script
-local success, errorMessage = pcall(function()
-    loadstring(game:HttpGet('https://raw.githubusercontent.com/Cry0xene/UniversalGUI/main/main.lua'))()
+-- Now execute the main script
+local success, err = pcall(function()
+    loadstring(mainScript)()
 end)
 
-if not success then
-    warn("Failed to load Universal GUI:", errorMessage)
+if success then
     Rayfield:Notify({
-        Title = "Load Error",
-        Content = "Failed to load script: " .. tostring(errorMessage),
+        Title = "✅ Success!",
+        Content = "Universal GUI loaded with 100+ features!",
         Duration = 5
     })
+    print("✅ Universal GUI loaded successfully!")
 else
+    warn("❌ Universal GUI failed to load:", err)
     Rayfield:Notify({
-        Title = "Universal GUI",
-        Content = "Successfully loaded 100+ features!",
-        Duration = 3
+        Title = "❌ Error",
+        Content = "Failed to load: " .. tostring(err),
+        Duration = 5
     })
 end
--- Now load the main script
-loadstring(game:HttpGet('https://raw.githubusercontent.com/Cry0xene/UniversalGUI/main/main.lua'))()
