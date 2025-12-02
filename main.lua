@@ -1,7 +1,16 @@
---// 99 Nights in the Forest Script with Pink I Love Anne Theme //--
+--// 99 Nights in the Forest Script //--
+-- Title: I Love Anne
+-- Theme: Pink
 
--- Load Orion UI Library (Clean, modern, mobile-friendly)
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+-- Load Flux UI Library (Reliable and clean)
+local Success, Flux = pcall(function()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Flux-Library/main/Flux.lua"))()
+end)
+
+if not Success then
+    warn("Flux UI failed to load, trying backup...")
+    Flux = loadstring(game:HttpGet("https://raw.githubusercontent.com/1201for/Flux-Ui-Library/main/Flux.lua"))()
+end
 
 -- Services
 local Players = game:GetService("Players")
@@ -10,31 +19,739 @@ local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
--- Pink Theme Colors
-local ThemeColor = Color3.fromRGB(255, 105, 180) -- Hot Pink
-local ThemeColor2 = Color3.fromRGB(255, 182, 193) -- Light Pink
-local BackgroundColor = Color3.fromRGB(30, 30, 40) -- Dark background for contrast
-local TextColor = Color3.fromRGB(255, 255, 255)
-
 -- Window Setup with Pink Theme
-local Window = OrionLib:MakeWindow({
-    Name = "I ❤️ Anne - 99 Nights",
-    HidePremium = false,
-    SaveConfig = true,
-    ConfigFolder = "I_Love_Anne_Settings",
-    IntroEnabled = true,
-    IntroText = "I Love Anne",
-    IntroIcon = "rbxassetid://4483362458",
-    ThemeColor = ThemeColor,
-    Icon = "rbxassetid://4483362458"
-})
-
--- Update OrionLib theme colors
-OrionLib.ThemeColor = ThemeColor
+local Window = Flux:Window("I ❤️ Anne - 99 Nights", "Version 1.0", Color3.fromRGB(255, 105, 180), Enum.KeyCode.RightControl)
 
 -- Variables
 local teleportTargets = {
     "Alpha Wolf", "Alpha Wolf Pelt", "Anvil Base", "Apple", "Bandage", "Bear", "Berry", 
+    "Bolt", "Broken Fan", "Broken Microwave", "Bunny", "Bunny Foot", "Cake", "Carrot", "Chair Set", "Chest", "Chilli",
+    "Coal", "Coin Stack", "Crossbow Cultist", "Cultist", "Cultist Gem", "Deer", "Fuel Canister", "Good Sack", "Good Axe", "Iron Body",
+    "Item Chest", "Item Chest2", "Item Chest3", "Item Chest4", "Item Chest6", "Leather Body", "Log", "Lost Child",
+    "Lost Child2", "Lost Child3", "Lost Child4", "Medkit", "Meat? Sandwich", "Morsel", "Old Car Engine", "Old Flashlight", "Old Radio", "Oil Barrel",
+    "Revolver", "Revolver Ammo", "Rifle", "Rifle Ammo", "Riot Shield", "Sapling", "Seed Box", "Sheet Metal", "Spear",
+    "Steak", "Stronghold Diamond Chest", "Tyre", "Washing Machine", "Wolf", "Wolf Corpse", "Wolf Pelt"
+}
+local AimbotTargets = {"Alpha Wolf", "Wolf", "Crossbow Cultist", "Cultist", "Bunny", "Bear", "Polar Bear"}
+local espEnabled = false
+local npcESPEnabled = false
+local ignoreDistanceFrom = Vector3.new(0, 0, 0)
+local minDistance = 50
+local AutoTreeFarmEnabled = false
+
+-- Click simulation
+local VirtualInputManager = game:GetService("VirtualInputManager")
+function mouse1click()
+    VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+    VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+end
+
+-- Aimbot FOV Circle
+local AimbotEnabled = false
+local FOVRadius = 100
+local FOVCircle = Drawing.new("Circle")
+FOVCircle.Color = Color3.fromRGB(255, 105, 180) -- Pink
+FOVCircle.Thickness = 2
+FOVCircle.Radius = FOVRadius
+FOVCircle.Transparency = 0.5
+FOVCircle.Filled = false
+FOVCircle.Visible = false
+
+RunService.RenderStepped:Connect(function()
+    if AimbotEnabled then
+        local mousePos = UserInputService:GetMouseLocation()
+        FOVCircle.Position = Vector2.new(mousePos.X, mousePos.Y)
+        FOVCircle.Visible = true
+    else
+        FOVCircle.Visible = false
+    end
+end)
+
+-- ESP Function
+local function createESP(item)
+    local adorneePart
+    if item:IsA("Model") then
+        if item:FindFirstChildWhichIsA("Humanoid") then return end
+        adorneePart = item:FindFirstChildWhichIsA("BasePart")
+    elseif item:IsA("BasePart") then
+        adorneePart = item
+    else
+        return
+    end
+
+    if not adorneePart then return end
+
+    local distance = (adorneePart.Position - ignoreDistanceFrom).Magnitude
+    if distance < minDistance then return end
+
+    if not item:FindFirstChild("ESP_Billboard") then
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "ESP_Billboard"
+        billboard.Adornee = adorneePart
+        billboard.Size = UDim2.new(0, 50, 0, 20)
+        billboard.AlwaysOnTop = true
+        billboard.StudsOffset = Vector3.new(0, 2, 0)
+
+        local label = Instance.new("TextLabel", billboard)
+        label.Size = UDim2.new(1, 0, 1, 0)
+        label.Text = item.Name
+        label.BackgroundTransparency = 1
+        label.TextColor3 = Color3.fromRGB(255, 182, 193) -- Light Pink
+        label.TextStrokeTransparency = 0
+        label.TextScaled = true
+        billboard.Parent = item
+    end
+
+    if not item:FindFirstChild("ESP_Highlight") then
+        local highlight = Instance.new("Highlight")
+        highlight.Name = "ESP_Highlight"
+        highlight.FillColor = Color3.fromRGB(255, 105, 180) -- Hot Pink
+        highlight.OutlineColor = Color3.fromRGB(255, 182, 193) -- Light Pink
+        highlight.FillTransparency = 0.25
+        highlight.OutlineTransparency = 0
+        highlight.Adornee = item:IsA("Model") and item or adorneePart
+        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        highlight.Parent = item
+    end
+end
+
+local function toggleESP(state)
+    espEnabled = state
+    for _, item in pairs(workspace:GetDescendants()) do
+        if table.find(teleportTargets, item.Name) then
+            if espEnabled then
+                createESP(item)
+            else
+                if item:FindFirstChild("ESP_Billboard") then item.ESP_Billboard:Destroy() end
+                if item:FindFirstChild("ESP_Highlight") then item.ESP_Highlight:Destroy() end
+            end
+        end
+    end
+end
+
+workspace.DescendantAdded:Connect(function(desc)
+    if espEnabled and table.find(teleportTargets, desc.Name) then
+        task.wait(0.1)
+        createESP(desc)
+    end
+end)
+
+-- ESP for NPCs
+local npcBoxes = {}
+
+local function createNPCESP(npc)
+    if not npc:IsA("Model") or npc:FindFirstChild("HumanoidRootPart") == nil then return end
+
+    local root = npc:FindFirstChild("HumanoidRootPart")
+    if npcBoxes[npc] then return end
+
+    local box = Drawing.new("Square")
+    box.Thickness = 2
+    box.Transparency = 1
+    box.Color = Color3.fromRGB(255, 105, 180) -- Pink
+    box.Filled = false
+    box.Visible = true
+
+    local nameText = Drawing.new("Text")
+    nameText.Text = "❤️ " .. npc.Name .. " ❤️"
+    nameText.Color = Color3.fromRGB(255, 182, 193) -- Light Pink
+    nameText.Size = 16
+    nameText.Center = true
+    nameText.Outline = true
+    nameText.Visible = true
+
+    npcBoxes[npc] = {box = box, name = nameText}
+
+    npc.AncestryChanged:Connect(function(_, parent)
+        if not parent and npcBoxes[npc] then
+            npcBoxes[npc].box:Remove()
+            npcBoxes[npc].name:Remove()
+            npcBoxes[npc] = nil
+        end
+    end)
+end
+
+local function toggleNPCESP(state)
+    npcESPEnabled = state
+    if not state then
+        for npc, visuals in pairs(npcBoxes) do
+            if visuals.box then visuals.box:Remove() end
+            if visuals.name then visuals.name:Remove() end
+        end
+        npcBoxes = {}
+    else
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if table.find(AimbotTargets, obj.Name) and obj:IsA("Model") then
+                createNPCESP(obj)
+            end
+        end
+    end
+end
+
+workspace.DescendantAdded:Connect(function(desc)
+    if table.find(AimbotTargets, desc.Name) and desc:IsA("Model") then
+        task.wait(0.1)
+        if npcESPEnabled then
+            createNPCESP(desc)
+        end
+    end
+end)
+
+-- Auto Tree Farm Logic
+local badTrees = {}
+
+task.spawn(function()
+    while true do
+        if AutoTreeFarmEnabled then
+            local trees = {}
+            for _, obj in pairs(workspace:GetDescendants()) do
+                if obj.Name == "Trunk" and obj.Parent and obj.Parent.Name == "Small Tree" then
+                    local distance = (obj.Position - ignoreDistanceFrom).Magnitude
+                    if distance > minDistance and not badTrees[obj:GetFullName()] then
+                        table.insert(trees, obj)
+                    end
+                end
+            end
+
+            table.sort(trees, function(a, b)
+                return (a.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <
+                       (b.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+            end)
+
+            for _, trunk in ipairs(trees) do
+                if not AutoTreeFarmEnabled then break end
+                LocalPlayer.Character:PivotTo(trunk.CFrame + Vector3.new(0, 3, 0))
+                task.wait(0.2)
+                local startTime = tick()
+                while AutoTreeFarmEnabled and trunk and trunk.Parent and trunk.Parent.Name == "Small Tree" do
+                    mouse1click()
+                    task.wait(0.2)
+                    if tick() - startTime > 12 then
+                        badTrees[trunk:GetFullName()] = true
+                        break
+                    end
+                end
+                task.wait(0.3)
+            end
+        end
+        task.wait(1.5)
+    end
+end)
+
+-- Auto Log Farm Variables
+local AutoLogFarmEnabled = false
+local LogBagType = "Auto"
+local currentSack = nil
+
+local function getBagType()
+    if not LocalPlayer.Character then return nil end
+    for _, child in pairs(LocalPlayer.Character:GetChildren()) do
+        if child.Name == "Old Sack" or child.Name == "Good Sack" then
+            return child.Name
+        end
+    end
+    return nil
+end
+
+local function getBagPickupCount()
+    local bagType = LogBagType == "Auto" and getBagType() or LogBagType
+    if bagType == "Good Sack" then
+        return 15
+    elseif bagType == "Old Sack" then
+        return 5
+    end
+    return 0
+end
+
+local function pressKey(key)
+    key = typeof(key) == "EnumItem" and key or Enum.KeyCode[key]
+    VirtualInputManager:SendKeyEvent(true, key, false, game)
+    task.wait(0.07)
+    VirtualInputManager:SendKeyEvent(false, key, false, game)
+end
+
+local function teleportToClosestLog()
+    local closest, shortest = nil, math.huge
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj.Name == "Log" and obj:IsA("Model") then
+            local cf = nil
+            if pcall(function() cf = obj:GetPivot() end) then
+                -- success
+            else
+                local part = obj:FindFirstChildWhichIsA("BasePart")
+                if part then cf = part.CFrame end
+            end
+            if cf then
+                local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    local dist = (cf.Position - hrp.Position).Magnitude
+                    if dist < shortest then
+                        closest = obj
+                        shortest = dist
+                    end
+                end
+            end
+        end
+    end
+    if closest then
+        local cf = nil
+        if pcall(function() cf = closest:GetPivot() end) then
+            -- success
+        else
+            local part = closest:FindFirstChildWhichIsA("BasePart")
+            if part then cf = part.CFrame end
+        end
+        if cf then
+            LocalPlayer.Character:PivotTo(cf + Vector3.new(0, 5, 0))
+            return closest
+        end
+    end
+    return nil
+end
+
+task.spawn(function()
+    while true do
+        if AutoLogFarmEnabled then
+            local pickupCount = getBagPickupCount()
+            if pickupCount == 0 then
+                task.wait(3)
+                continue
+            end
+
+            local log = teleportToClosestLog()
+            if log then
+                local footPos = LocalPlayer.Character.HumanoidRootPart.Position - Vector3.new(0, 3, 0)
+                local screen = camera:WorldToScreenPoint(footPos)
+                VirtualInputManager:SendMouseMoveEvent(screen.X, screen.Y, game)
+                task.wait(0.25)
+                
+                for i=1, pickupCount do
+                    pressKey("F")
+                    pressKey("E")
+                    task.wait(0.13)
+                end
+                
+                LocalPlayer.Character:PivotTo(CFrame.new(0, 10, 0))
+                task.wait(2)
+            else
+                task.wait(3)
+            end
+        end
+        task.wait(1)
+    end
+end)
+
+-- Optimized Aimbot
+local lastAimbotCheck = 0
+local aimbotCheckInterval = 0.02
+local smoothness = 0.2
+
+RunService.RenderStepped:Connect(function()
+    if not AimbotEnabled or not UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
+        return
+    end
+
+    local currentTime = tick()
+    if currentTime - lastAimbotCheck < aimbotCheckInterval then
+        return
+    end
+    lastAimbotCheck = currentTime
+
+    local mousePos = UserInputService:GetMouseLocation()
+    local closestTarget = nil
+    local shortestDistance = math.huge
+
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if table.find(AimbotTargets, obj.Name) and obj:IsA("Model") then
+            local head = obj:FindFirstChild("Head")
+            if head then
+                local screenPos, onScreen = camera:WorldToViewportPoint(head.Position)
+                if onScreen then
+                    local dist = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+                    if dist < shortestDistance and dist <= FOVRadius then
+                        shortestDistance = dist
+                        closestTarget = head
+                    end
+                end
+            end
+        end
+    end
+
+    if closestTarget then
+        local currentCF = camera.CFrame
+        local targetCF = CFrame.new(currentCF.Position, closestTarget.Position)
+        camera.CFrame = currentCF:Lerp(targetCF, smoothness)
+    end
+end)
+
+-- Fly Logic
+local flying, flyConnection = false, nil
+local speed = 60
+
+local function startFlying()
+    local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    local bodyGyro = Instance.new("BodyGyro", hrp)
+    local bodyVelocity = Instance.new("BodyVelocity", hrp)
+    bodyGyro.P = 9e4
+    bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    bodyGyro.CFrame = hrp.CFrame
+    bodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+
+    flyConnection = RunService.RenderStepped:Connect(function()
+        local moveVec = Vector3.zero
+        local camCF = camera.CFrame
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveVec += camCF.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveVec -= camCF.LookVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveVec -= camCF.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveVec += camCF.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveVec += camCF.UpVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then moveVec -= camCF.UpVector end
+        bodyVelocity.Velocity = moveVec.Magnitude > 0 and moveVec.Unit * speed or Vector3.zero
+        bodyGyro.CFrame = camCF
+    end)
+end
+
+local function stopFlying()
+    if flyConnection then flyConnection:Disconnect() end
+    local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        for _, v in pairs(hrp:GetChildren()) do
+            if v:IsA("BodyGyro") or v:IsA("BodyVelocity") then v:Destroy() end
+        end
+    end
+end
+
+local function toggleFly(state)
+    flying = state
+    if flying then startFlying() else stopFlying() end
+end
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Q then
+        toggleFly(not flying)
+    end
+end)
+
+-- NPC ESP Update Loop
+RunService.RenderStepped:Connect(function()
+    for npc, visuals in pairs(npcBoxes) do
+        local box = visuals.box
+        local name = visuals.name
+
+        if npc and npc:FindFirstChild("HumanoidRootPart") then
+            local hrp = npc.HumanoidRootPart
+            local size = Vector2.new(60, 80)
+            local screenPos, onScreen = camera:WorldToViewportPoint(hrp.Position)
+
+            if onScreen then
+                box.Position = Vector2.new(screenPos.X - size.X / 2, screenPos.Y - size.Y / 2)
+                box.Size = size
+                box.Visible = true
+
+                name.Position = Vector2.new(screenPos.X, screenPos.Y - size.Y / 2 - 15)
+                name.Visible = true
+            else
+                box.Visible = false
+                name.Visible = false
+            end
+        else
+            if box then box:Remove() end
+            if name then name:Remove() end
+            npcBoxes[npc] = nil
+        end
+    end
+end)
+
+-- Walk Speed Variable
+local currentSpeed = 16
+
+local function setWalkSpeed(speedValue)
+    currentSpeed = speedValue
+    local character = LocalPlayer.Character
+    if character and character:FindFirstChildOfClass("Humanoid") then
+        character:FindFirstChildOfClass("Humanoid").WalkSpeed = speedValue
+    end
+end
+
+LocalPlayer.CharacterAdded:Connect(function(char)
+    task.spawn(function()
+        local humanoid = char:WaitForChild("Humanoid", 5)
+        if humanoid then
+            humanoid.WalkSpeed = currentSpeed
+        end
+    end)
+end)
+
+-- Anti Death System
+local AntiDeathEnabled = false
+local AntiDeathRadius = 50
+local AntiDeathTargets = {
+    Alien = true,
+    ["Alpha Wolf"] = true,
+    Wolf = true,
+    ["Crossbow Cultist"] = true,
+    Cultist = true,
+    Bear = true,
+}
+
+-- Visual indicator (pink)
+local detectionCircle = Instance.new("Part")
+detectionCircle.Name = "AntiDeathCircle"
+detectionCircle.Anchored = true
+detectionCircle.CanCollide = false
+detectionCircle.Transparency = 0.7
+detectionCircle.Material = Enum.Material.Neon
+detectionCircle.Color = Color3.fromRGB(255, 105, 180) -- Pink
+detectionCircle.Parent = workspace
+
+local mesh = Instance.new("SpecialMesh", detectionCircle)
+mesh.MeshType = Enum.MeshType.Cylinder
+mesh.Scale = Vector3.new(AntiDeathRadius * 2, 0.2, AntiDeathRadius * 2)
+
+local function updateDetectionCircle()
+    local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        detectionCircle.Position = Vector3.new(hrp.Position.X, hrp.Position.Y - 3, hrp.Position.Z)
+        detectionCircle.Transparency = AntiDeathEnabled and 0.5 or 1
+    else
+        detectionCircle.Transparency = 1
+    end
+end
+
+RunService.RenderStepped:Connect(function()
+    updateDetectionCircle()
+end)
+
+task.spawn(function()
+    while true do
+        if AntiDeathEnabled then
+            local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                local pos = hrp.Position
+                for _, npc in ipairs(workspace:GetDescendants()) do
+                    if npc:IsA("Model") and npc:FindFirstChild("HumanoidRootPart") and AntiDeathTargets[npc.Name] then
+                        local npcPos = npc.HumanoidRootPart.Position
+                        if (npcPos - pos).Magnitude <= AntiDeathRadius then
+                            LocalPlayer.Character:PivotTo(CFrame.new(0, 10, 0))
+                            break
+                        end
+                    end
+                end
+            end
+        end
+        task.wait(0.2)
+    end
+end)
+
+-- Fog Toggle
+local defaultFogStart = game.Lighting.FogStart
+local defaultFogEnd = game.Lighting.FogEnd
+local fogEnabled = false
+
+-- GUI Tabs Creation
+local MainTab = Window:Tab("🏠 Main", "http://www.roblox.com/asset/?id=6023426915")
+
+MainTab:Label("I ❤️ Anne - 99 Nights Script")
+MainTab:Line()
+
+-- Teleport Buttons
+MainTab:Button("Teleport to Campfire", function()
+    LocalPlayer.Character:PivotTo(CFrame.new(0, 10, 0))
+end)
+
+MainTab:Button("Teleport to Grinder", function()
+    LocalPlayer.Character:PivotTo(CFrame.new(16.1, 4, -4.6))
+end)
+
+MainTab:Line()
+
+-- Speed Slider
+MainTab:Slider("Walk Speed", 16, 100, 16, function(value)
+    setWalkSpeed(value)
+end)
+
+MainTab:Line()
+
+-- Toggles
+MainTab:Toggle("Item ESP", false, function(value)
+    toggleESP(value)
+end)
+
+MainTab:Toggle("NPC ESP", false, function(value)
+    toggleNPCESP(value)
+end)
+
+MainTab:Toggle("Auto Tree Farm", false, function(value)
+    AutoTreeFarmEnabled = value
+end)
+
+MainTab:Toggle("Auto Log Farm", false, function(value)
+    AutoLogFarmEnabled = value
+end)
+
+MainTab:Toggle("Aimbot (Right Click)", false, function(value)
+    AimbotEnabled = value
+    FOVCircle.Visible = value
+end)
+
+MainTab:Toggle("Fly (WASD + Space + Shift)", false, function(value)
+    toggleFly(value)
+end)
+
+MainTab:Toggle("Anti Death Teleport", false, function(value)
+    AntiDeathEnabled = value
+end)
+
+MainTab:Toggle("No Fog (Clear Skies)", false, function(value)
+    fogEnabled = value
+    if fogEnabled then
+        game.Lighting.FogStart = 999999
+        game.Lighting.FogEnd = 1000000
+    else
+        game.Lighting.FogStart = defaultFogStart
+        game.Lighting.FogEnd = defaultFogEnd
+    end
+end)
+
+-- Anti Death Settings
+local AntiDeathTab = Window:Tab("🛡️ Anti Death", "http://www.roblox.com/asset/?id=6023426915")
+
+AntiDeathTab:Slider("Detection Radius", 10, 150, 50, function(value)
+    AntiDeathRadius = value
+    mesh.Scale = Vector3.new(value * 2, 0.2, value * 2)
+end)
+
+AntiDeathTab:Line()
+AntiDeathTab:Label("NPCs to Avoid:")
+
+for npcName, _ in pairs(AntiDeathTargets) do
+    AntiDeathTab:Toggle("Avoid " .. npcName, true, function(value)
+        AntiDeathTargets[npcName] = value
+    end)
+end
+
+-- Teleport Tab
+local TeleportTab = Window:Tab("🧲 Teleport", "http://www.roblox.com/asset/?id=6023426915")
+
+TeleportTab:Label("Click to teleport to item")
+TeleportTab:Line()
+
+-- Create teleport buttons for each item
+for _, itemName in ipairs(teleportTargets) do
+    TeleportTab:Button("Teleport to " .. itemName, function()
+        local closest, shortest = nil, math.huge
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj.Name == itemName and obj:IsA("Model") then
+                local cf = nil
+                if pcall(function() cf = obj:GetPivot() end) then
+                    -- success
+                else
+                    local part = obj:FindFirstChildWhichIsA("BasePart")
+                    if part then cf = part.CFrame end
+                end
+                if cf then
+                    local dist = (cf.Position - ignoreDistanceFrom).Magnitude
+                    if dist >= minDistance and dist < shortest then
+                        closest = obj
+                        shortest = dist
+                    end
+                end
+            end
+        end
+        if closest then
+            local cf = nil
+            if pcall(function() cf = closest:GetPivot() end) then
+                -- success
+            else
+                local part = closest:FindFirstChildWhichIsA("BasePart")
+                if part then cf = part.CFrame end
+            end
+            if cf then
+                LocalPlayer.Character:PivotTo(cf + Vector3.new(0, 5, 0))
+            end
+        end
+    end)
+end
+
+-- Log Farm Tab
+local LogTab = Window:Tab("🌳 Log Farm", "http://www.roblox.com/asset/?id=6023426915")
+
+LogTab:Label("Log Farm Settings")
+LogTab:Line()
+
+LogTab:Toggle("Use Old Sack (5 logs)", false, function(value)
+    if value then
+        LogBagType = "Old Sack"
+    else
+        if LogBagType == "Old Sack" then
+            LogBagType = "Auto"
+        end
+    end
+end)
+
+LogTab:Toggle("Use Good Sack (15 logs)", false, function(value)
+    if value then
+        LogBagType = "Good Sack"
+    else
+        if LogBagType == "Good Sack" then
+            LogBagType = "Auto"
+        end
+    end
+end)
+
+-- Visuals Tab
+local VisualsTab = Window:Tab("🎨 Visuals", "http://www.roblox.com/asset/?id=6023426915")
+
+VisualsTab:Toggle("Pink Ambient Light", false, function(value)
+    if value then
+        game.Lighting.Ambient = Color3.fromRGB(255, 182, 193)
+        game.Lighting.OutdoorAmbient = Color3.fromRGB(255, 182, 193)
+        game.Lighting.ColorShift_Top = Color3.fromRGB(255, 105, 180)
+    else
+        game.Lighting.Ambient = Color3.fromRGB(1, 1, 1)
+        game.Lighting.OutdoorAmbient = Color3.fromRGB(1, 1, 1)
+        game.Lighting.ColorShift_Top = Color3.fromRGB(1, 1, 1)
+    end
+end)
+
+VisualsTab:Slider("Brightness", 0, 10, 1, function(value)
+    game.Lighting.Brightness = value
+end)
+
+-- Settings Tab
+local SettingsTab = Window:Tab("⚙️ Settings", "http://www.roblox.com/asset/?id=6023426915")
+
+SettingsTab:Button("Save Settings", function()
+    -- Save functionality placeholder
+end)
+
+SettingsTab:Button("Reset Settings", function()
+    -- Reset functionality placeholder
+end)
+
+SettingsTab:Line()
+SettingsTab:Label("I ❤️ Anne Script")
+SettingsTab:Label("Made with love for Anne")
+SettingsTab:Label("Version 1.0 - Pink Theme")
+
+-- Initialize the window
+Flux:Init()
+
+-- Cleanup on game close
+game:GetService("UserInputService").WindowFocusReleased:Connect(function()
+    toggleESP(false)
+    toggleNPCESP(false)
+    toggleFly(false)
+    AimbotEnabled = false
+    AutoTreeFarmEnabled = false
+    AutoLogFarmEnabled = false
+    AntiDeathEnabled = false
+    if detectionCircle then detectionCircle:Destroy() end
+    if FOVCircle then FOVCircle:Remove() end
+end)    "Alpha Wolf", "Alpha Wolf Pelt", "Anvil Base", "Apple", "Bandage", "Bear", "Berry", 
     "Bolt", "Broken Fan", "Broken Microwave", "Bunny", "Bunny Foot", "Cake", "Carrot", "Chair Set", "Chest", "Chilli",
     "Coal", "Coin Stack", "Crossbow Cultist", "Cultist", "Cultist Gem", "Deer", "Fuel Canister", "Good Sack", "Good Axe", "Iron Body",
     "Item Chest", "Item Chest2", "Item Chest3", "Item Chest4", "Item Chest6", "Leather Body", "Log", "Lost Child",
