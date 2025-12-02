@@ -6,14 +6,7 @@ local LocalPlayer = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
 local Themes = {
-    Default = {MainBg = Color3.fromRGB(15, 20, 30), SidebarBg = Color3.fromRGB(10, 15, 25), ContentBg = Color3.fromRGB(20, 25, 40), Accent = Color3.fromRGB(0, 200, 255), Text = Color3.fromRGB(230, 230, 250), Button = Color3.fromRGB(30, 40, 60), DarkButton = Color3.fromRGB(20, 30, 50)},
-    Cyber = {MainBg = Color3.fromRGB(10, 10, 20), SidebarBg = Color3.fromRGB(5, 5, 15), ContentBg = Color3.fromRGB(15, 15, 30), Accent = Color3.fromRGB(0, 255, 255), Text = Color3.fromRGB(200, 240, 255), Button = Color3.fromRGB(25, 35, 55), DarkButton = Color3.fromRGB(15, 25, 45)},
-    Neon = {MainBg = Color3.fromRGB(20, 10, 30), SidebarBg = Color3.fromRGB(15, 5, 25), ContentBg = Color3.fromRGB(25, 15, 40), Accent = Color3.fromRGB(255, 0, 255), Text = Color3.fromRGB(255, 200, 255), Button = Color3.fromRGB(40, 20, 60), DarkButton = Color3.fromRGB(30, 10, 50)},
-    Matrix = {MainBg = Color3.fromRGB(0, 15, 0), SidebarBg = Color3.fromRGB(0, 10, 0), ContentBg = Color3.fromRGB(0, 20, 0), Accent = Color3.fromRGB(0, 255, 0), Text = Color3.fromRGB(200, 255, 200), Button = Color3.fromRGB(0, 30, 0), DarkButton = Color3.fromRGB(0, 20, 0)},
-    Sunset = {MainBg = Color3.fromRGB(30, 15, 10), SidebarBg = Color3.fromRGB(25, 10, 5), ContentBg = Color3.fromRGB(35, 20, 15), Accent = Color3.fromRGB(255, 100, 0), Text = Color3.fromRGB(255, 230, 200), Button = Color3.fromRGB(50, 25, 20), DarkButton = Color3.fromRGB(40, 15, 10)},
-    Gold = {MainBg = Color3.fromRGB(20, 15, 5), SidebarBg = Color3.fromRGB(15, 10, 0), ContentBg = Color3.fromRGB(25, 20, 10), Accent = Color3.fromRGB(255, 215, 0), Text = Color3.fromRGB(255, 245, 200), Button = Color3.fromRGB(40, 30, 15), DarkButton = Color3.fromRGB(30, 20, 5)},
-    Ocean = {MainBg = Color3.fromRGB(10, 20, 35), SidebarBg = Color3.fromRGB(5, 15, 30), ContentBg = Color3.fromRGB(15, 25, 45), Accent = Color3.fromRGB(0, 150, 255), Text = Color3.fromRGB(200, 230, 255), Button = Color3.fromRGB(25, 35, 55), DarkButton = Color3.fromRGB(15, 25, 40)},
-    Blood = {MainBg = Color3.fromRGB(25, 5, 5), SidebarBg = Color3.fromRGB(20, 0, 0), ContentBg = Color3.fromRGB(35, 10, 10), Accent = Color3.fromRGB(255, 0, 0), Text = Color3.fromRGB(255, 200, 200), Button = Color3.fromRGB(45, 15, 15), DarkButton = Color3.fromRGB(35, 5, 5)}
+    Default = {MainBg = Color3.fromRGB(15, 20, 30), SidebarBg = Color3.fromRGB(10, 15, 25), ContentBg = Color3.fromRGB(20, 25, 40), Accent = Color3.fromRGB(0, 200, 255), Text = Color3.fromRGB(230, 230, 250), Button = Color3.fromRGB(30, 40, 60), DarkButton = Color3.fromRGB(20, 30, 50)}
 }
 
 local CurrentTheme = "Default"
@@ -30,11 +23,711 @@ local MainGui = Instance.new("ScreenGui")
 MainGui.Name = "Cry0xeneHUB"
 MainGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 MainGui.DisplayOrder = 999
-MainGui.Parent = game:GetService("CoreGui") or LocalPlayer:WaitForChild("PlayerGui")
+MainGui.Parent = game:GetService("CoreGui")
 
-local PlayerListGui = Instance.new("ScreenGui")
-PlayerListGui.Name = "Cry0xenePlayers"
-PlayerListGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 750, 0, 600)
+MainFrame.Position = UDim2.new(0.5, -375, 0.5, -300)
+MainFrame.BackgroundColor3 = ThemeColors.MainBg
+MainFrame.BorderSizePixel = 0
+MainFrame.ClipsDescendants = true
+MainFrame.Visible = true
+MainFrame.Parent = MainGui
+
+local Header = Instance.new("Frame")
+Header.Name = "Header"
+Header.Size = UDim2.new(1, 0, 0, 50)
+Header.BackgroundColor3 = Color3.fromRGB(5, 10, 20)
+Header.BorderSizePixel = 0
+Header.ZIndex = 2
+Header.Parent = MainFrame
+
+local TitleFrame = Instance.new("Frame")
+TitleFrame.Size = UDim2.new(0, 320, 1, 0)
+TitleFrame.Position = UDim2.new(0, 20, 0, 0)
+TitleFrame.BackgroundTransparency = 1
+TitleFrame.Parent = Header
+
+local Title = Instance.new("TextLabel")
+Title.Text = "CRY0XENE HUB"
+Title.Size = UDim2.new(1, 0, 1, 0)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.BackgroundTransparency = 1
+Title.TextColor3 = ThemeColors.Accent
+Title.TextSize = 24
+Title.Font = Enum.Font.GothamBlack
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = TitleFrame
+
+local Subtitle = Instance.new("TextLabel")
+Subtitle.Text = "v7.0 | PRESS RCTRL"
+Subtitle.Size = UDim2.new(1, 0, 0, 18)
+Subtitle.Position = UDim2.new(0, 0, 0, 32)
+Subtitle.BackgroundTransparency = 1
+Subtitle.TextColor3 = Color3.fromRGB(150, 200, 255)
+Subtitle.TextSize = 12
+Subtitle.Font = Enum.Font.Gotham
+Subtitle.TextXAlignment = Enum.TextXAlignment.Left
+Subtitle.Parent = TitleFrame
+
+local CloseButton = Instance.new("TextButton")
+CloseButton.Text = "✕"
+CloseButton.Size = UDim2.new(0, 50, 1, 0)
+CloseButton.Position = UDim2.new(1, -50, 0, 0)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 40, 40)
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 24
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Parent = Header
+
+local MinimizeButton = Instance.new("TextButton")
+MinimizeButton.Text = "—"
+MinimizeButton.Size = UDim2.new(0, 50, 1, 0)
+MinimizeButton.Position = UDim2.new(1, -100, 0, 0)
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(50, 60, 80)
+MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeButton.TextSize = 28
+MinimizeButton.Font = Enum.Font.GothamBold
+MinimizeButton.Parent = Header
+
+local MainContent = Instance.new("Frame")
+MainContent.Name = "MainContent"
+MainContent.Size = UDim2.new(1, 0, 1, -50)
+MainContent.Position = UDim2.new(0, 0, 0, 50)
+MainContent.BackgroundTransparency = 1
+MainContent.Parent = MainFrame
+
+local SidePanel = Instance.new("Frame")
+SidePanel.Name = "SidePanel"
+SidePanel.Size = UDim2.new(0, 220, 1, 0)
+SidePanel.Position = UDim2.new(0, 0, 0, 0)
+SidePanel.BackgroundColor3 = ThemeColors.SidebarBg
+SidePanel.BorderSizePixel = 0
+SidePanel.Parent = MainContent
+
+local ProfileCard = Instance.new("Frame")
+ProfileCard.Name = "ProfileCard"
+ProfileCard.Size = UDim2.new(1, 0, 0, 200)
+ProfileCard.BackgroundColor3 = Color3.fromRGB(15, 20, 35)
+ProfileCard.BorderSizePixel = 0
+ProfileCard.Parent = SidePanel
+
+local AvatarFrame = Instance.new("Frame")
+AvatarFrame.Size = UDim2.new(0, 100, 0, 100)
+AvatarFrame.Position = UDim2.new(0.5, -50, 0, 20)
+AvatarFrame.BackgroundColor3 = Color3.fromRGB(25, 30, 50)
+AvatarFrame.BorderSizePixel = 0
+local AvatarCorner = Instance.new("UICorner")
+AvatarCorner.CornerRadius = UDim.new(1, 0)
+AvatarCorner.Parent = AvatarFrame
+
+local AvatarImage = Instance.new("ImageLabel")
+AvatarImage.Size = UDim2.new(1, -10, 1, -10)
+AvatarImage.Position = UDim2.new(0, 5, 0, 5)
+AvatarImage.BackgroundTransparency = 1
+AvatarImage.Image = getPlayerAvatar(LocalPlayer.UserId)
+local ImageCorner = Instance.new("UICorner")
+ImageCorner.CornerRadius = UDim.new(1, 0)
+ImageCorner.Parent = AvatarImage
+AvatarImage.Parent = AvatarFrame
+AvatarFrame.Parent = ProfileCard
+
+local UsernameText = Instance.new("TextLabel")
+UsernameText.Text = "@" .. LocalPlayer.Name
+UsernameText.Size = UDim2.new(1, -20, 0, 25)
+UsernameText.Position = UDim2.new(0, 10, 0, 140)
+UsernameText.BackgroundTransparency = 1
+UsernameText.TextColor3 = ThemeColors.Text
+UsernameText.TextSize = 16
+UsernameText.Font = Enum.Font.GothamBold
+UsernameText.TextXAlignment = Enum.TextXAlignment.Center
+UsernameText.Parent = ProfileCard
+
+local DisplayNameText = Instance.new("TextLabel")
+DisplayNameText.Text = LocalPlayer.DisplayName
+DisplayNameText.Size = UDim2.new(1, -20, 0, 20)
+DisplayNameText.Position = UDim2.new(0, 10, 0, 165)
+DisplayNameText.BackgroundTransparency = 1
+DisplayNameText.TextColor3 = Color3.fromRGB(180, 200, 255)
+DisplayNameText.TextSize = 14
+DisplayNameText.Font = Enum.Font.Gotham
+DisplayNameText.TextXAlignment = Enum.TextXAlignment.Center
+DisplayNameText.Parent = ProfileCard
+
+local TimeCard = Instance.new("Frame")
+TimeCard.Size = UDim2.new(1, -20, 0, 40)
+TimeCard.Position = UDim2.new(0, 10, 0, 200)
+TimeCard.BackgroundColor3 = ThemeColors.ContentBg
+TimeCard.BorderSizePixel = 0
+local TimeCorner = Instance.new("UICorner")
+TimeCorner.CornerRadius = UDim.new(0.1, 0)
+TimeCorner.Parent = TimeCard
+TimeCard.Parent = ProfileCard
+
+local TimeIcon = Instance.new("ImageLabel")
+TimeIcon.Image = "rbxassetid://6031280882"
+TimeIcon.Size = UDim2.new(0, 20, 0, 20)
+TimeIcon.Position = UDim2.new(0, 10, 0.5, -10)
+TimeIcon.BackgroundTransparency = 1
+TimeIcon.ImageColor3 = ThemeColors.Accent
+TimeIcon.Parent = TimeCard
+
+local TimeLabel = Instance.new("TextLabel")
+TimeLabel.Text = "00:00:00"
+TimeLabel.Size = UDim2.new(1, -40, 1, 0)
+TimeLabel.Position = UDim2.new(0, 35, 0, 0)
+TimeLabel.BackgroundTransparency = 1
+TimeLabel.TextColor3 = ThemeColors.Text
+TimeLabel.TextSize = 16
+TimeLabel.Font = Enum.Font.GothamBold
+TimeLabel.TextXAlignment = Enum.TextXAlignment.Left
+TimeLabel.Parent = TimeCard
+
+spawn(function()
+    while true do
+        local time = os.date("%H:%M:%S")
+        TimeLabel.Text = time
+        wait(1)
+    end
+end)
+
+local TabsPanel = Instance.new("Frame")
+TabsPanel.Name = "TabsPanel"
+TabsPanel.Size = UDim2.new(1, 0, 1, -240)
+TabsPanel.Position = UDim2.new(0, 0, 0, 240)
+TabsPanel.BackgroundTransparency = 1
+TabsPanel.Parent = SidePanel
+
+local TabButtons = Instance.new("ScrollingFrame")
+TabButtons.Size = UDim2.new(1, 0, 1, 0)
+TabButtons.BackgroundTransparency = 1
+TabButtons.BorderSizePixel = 0
+TabButtons.ScrollBarThickness = 3
+TabButtons.ScrollBarImageColor3 = ThemeColors.Accent
+TabButtons.CanvasSize = UDim2.new(0, 0, 0, 0)
+TabButtons.Parent = TabsPanel
+
+local ContentPanel = Instance.new("Frame")
+ContentPanel.Name = "ContentPanel"
+ContentPanel.Size = UDim2.new(1, -220, 1, 0)
+ContentPanel.Position = UDim2.new(0, 220, 0, 0)
+ContentPanel.BackgroundColor3 = ThemeColors.ContentBg
+ContentPanel.BorderSizePixel = 0
+ContentPanel.Parent = MainContent
+
+local ContentHeader = Instance.new("Frame")
+ContentHeader.Name = "ContentHeader"
+ContentHeader.Size = UDim2.new(1, 0, 0, 60)
+ContentHeader.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
+ContentHeader.BorderSizePixel = 0
+ContentHeader.Parent = ContentPanel
+
+local ContentTitle = Instance.new("TextLabel")
+ContentTitle.Text = "MAIN"
+ContentTitle.Size = UDim2.new(1, -40, 1, 0)
+ContentTitle.Position = UDim2.new(0, 20, 0, 0)
+ContentTitle.BackgroundTransparency = 1
+ContentTitle.TextColor3 = ThemeColors.Accent
+ContentTitle.TextSize = 24
+ContentTitle.Font = Enum.Font.GothamBlack
+ContentTitle.TextXAlignment = Enum.TextXAlignment.Left
+ContentTitle.Parent = ContentHeader
+
+local ContentScroll = Instance.new("ScrollingFrame")
+ContentScroll.Size = UDim2.new(1, 0, 1, -60)
+ContentScroll.Position = UDim2.new(0, 0, 0, 60)
+ContentScroll.BackgroundTransparency = 1
+ContentScroll.BorderSizePixel = 0
+ContentScroll.ScrollBarThickness = 6
+ContentScroll.ScrollBarImageColor3 = ThemeColors.Accent
+ContentScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+ContentScroll.Parent = ContentPanel
+
+local dragging = false
+local dragStart, startPos
+
+local function updateTheme()
+    ThemeColors = Themes[CurrentTheme]
+    
+    MainFrame.BackgroundColor3 = ThemeColors.MainBg
+    SidePanel.BackgroundColor3 = ThemeColors.SidebarBg
+    ContentPanel.BackgroundColor3 = ThemeColors.ContentBg
+    Title.TextColor3 = ThemeColors.Accent
+    ContentTitle.TextColor3 = ThemeColors.Accent
+    ProfileCard.BackgroundColor3 = Color3.fromRGB(math.min(ThemeColors.SidebarBg.R * 255 + 5, 255), math.min(ThemeColors.SidebarBg.G * 255 + 5, 255), math.min(ThemeColors.SidebarBg.B * 255 + 5, 255)) / 255
+    UsernameText.TextColor3 = ThemeColors.Text
+    DisplayNameText.TextColor3 = Color3.fromRGB(math.min(ThemeColors.Text.R * 255 - 30, 255), math.min(ThemeColors.Text.G * 255 - 30, 255), math.min(ThemeColors.Text.B * 255 - 30, 255)) / 255
+    TimeCard.BackgroundColor3 = ThemeColors.ContentBg
+    TimeIcon.ImageColor3 = ThemeColors.Accent
+    TimeLabel.TextColor3 = ThemeColors.Text
+    TabButtons.ScrollBarImageColor3 = ThemeColors.Accent
+    ContentScroll.ScrollBarImageColor3 = ThemeColors.Accent
+    ContentHeader.BackgroundColor3 = Color3.fromRGB(math.min(ThemeColors.ContentBg.R * 255 - 10, 255), math.min(ThemeColors.ContentBg.G * 255 - 10, 255), math.min(ThemeColors.ContentBg.B * 255 - 10, 255)) / 255
+    
+    for _, tab in pairs(Tabs) do
+        if tab.Button and tab.Button:IsA("TextButton") then
+            if CurrentTab == tab.Button.Name:gsub("Tab", "") then
+                tab.Button.BackgroundColor3 = ThemeColors.Accent
+                tab.Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            else
+                tab.Button.BackgroundColor3 = ThemeColors.DarkButton
+                tab.Button.TextColor3 = ThemeColors.Text
+            end
+        end
+    end
+end
+
+Header.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+local function setupButtonHover(button, defaultColor, hoverColor)
+    defaultColor = defaultColor or ThemeColors.Button
+    hoverColor = hoverColor or Color3.fromRGB(math.min(defaultColor.R * 255 + 40, 255), math.min(defaultColor.G * 255 + 40, 255), math.min(defaultColor.B * 255 + 40, 255)) / 255
+    
+    button.MouseEnter:Connect(function()
+        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = hoverColor}):Play()
+    end)
+    
+    button.MouseLeave:Connect(function()
+        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = defaultColor}):Play()
+    end)
+end
+
+local Tabs = {}
+local CurrentTab = nil
+
+local tabList = {
+    {Name = "MAIN", Icon = "🏠"},
+    {Name = "VISUALS", Icon = "👁️"},
+    {Name = "SETTINGS", Icon = "⚙️"}
+}
+
+local buttonY = 0
+for i, tabData in ipairs(tabList) do
+    local TabButton = Instance.new("TextButton")
+    TabButton.Name = tabData.Name .. "Tab"
+    TabButton.Text = "  " .. tabData.Icon .. "  " .. tabData.Name
+    TabButton.Size = UDim2.new(1, -20, 0, 45)
+    TabButton.Position = UDim2.new(0, 10, 0, buttonY)
+    TabButton.BackgroundColor3 = i == 1 and ThemeColors.Accent or ThemeColors.DarkButton
+    TabButton.BorderSizePixel = 0
+    TabButton.TextColor3 = i == 1 and Color3.fromRGB(255, 255, 255) or ThemeColors.Text
+    TabButton.TextSize = 14
+    TabButton.Font = Enum.Font.Gotham
+    TabButton.TextXAlignment = Enum.TextXAlignment.Left
+    TabButton.AutoButtonColor = false
+    
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0.1, 0)
+    Corner.Parent = TabButton
+    
+    TabButton.Parent = TabButtons
+    setupButtonHover(TabButton, TabButton.BackgroundColor3, Color3.fromRGB(math.min(TabButton.BackgroundColor3.R * 255 + 40, 255), math.min(TabButton.BackgroundColor3.G * 255 + 40, 255), math.min(TabButton.BackgroundColor3.B * 255 + 40, 255)) / 255)
+    
+    local TabContent = Instance.new("ScrollingFrame")
+    TabContent.Name = tabData.Name .. "Content"
+    TabContent.Size = UDim2.new(1, 0, 1, 0)
+    TabContent.BackgroundTransparency = 1
+    TabContent.Visible = i == 1
+    TabContent.ScrollBarThickness = 6
+    TabContent.ScrollBarImageColor3 = ThemeColors.Accent
+    TabContent.CanvasSize = UDim2.new(0, 0, 0, 0)
+    TabContent.Parent = ContentScroll
+    
+    Tabs[tabData.Name] = {Button = TabButton, Content = TabContent}
+    
+    TabButton.MouseButton1Click:Connect(function()
+        if CurrentTab then
+            Tabs[CurrentTab].Content.Visible = false
+            Tabs[CurrentTab].Button.BackgroundColor3 = ThemeColors.DarkButton
+            Tabs[CurrentTab].Button.TextColor3 = ThemeColors.Text
+        end
+        
+        TabContent.Visible = true
+        ContentTitle.Text = tabData.Name
+        TabButton.BackgroundColor3 = ThemeColors.Accent
+        TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        CurrentTab = tabData.Name
+        
+        loadTabContent(tabData.Name, TabContent)
+    end)
+    
+    buttonY = buttonY + 50
+end
+
+TabButtons.CanvasSize = UDim2.new(0, 0, 0, buttonY)
+
+CloseButton.MouseButton1Click:Connect(function()
+    MainGui:Destroy()
+end)
+
+MinimizeButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.RightControl then
+        MainFrame.Visible = not MainFrame.Visible
+    end
+end)
+
+local Features = {
+    Fly = false,
+    NoClip = false,
+    Speed = false,
+    Xray = false,
+    Fullbright = false,
+    Esp = false,
+    Aimbot = false,
+    AutoClick = false,
+    InfJump = false,
+    GodMode = false,
+    Invisible = false
+}
+
+local function createButton(parent, text, callback)
+    local yPos = #parent:GetChildren() * 50
+    
+    local Button = Instance.new("TextButton")
+    Button.Text = text
+    Button.Size = UDim2.new(1, -30, 0, 45)
+    Button.Position = UDim2.new(0, 15, 0, yPos)
+    Button.BackgroundColor3 = ThemeColors.Button
+    Button.BorderSizePixel = 0
+    Button.TextColor3 = ThemeColors.Text
+    Button.TextSize = 14
+    Button.Font = Enum.Font.Gotham
+    Button.Parent = parent
+    
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0.1, 0)
+    Corner.Parent = Button
+    
+    Button.MouseButton1Click:Connect(callback)
+    setupButtonHover(Button)
+    
+    parent.CanvasSize = UDim2.new(0, 0, 0, yPos + 55)
+    return Button
+end
+
+local function createToggle(parent, text, callback, defaultState)
+    local yPos = #parent:GetChildren() * 50
+    
+    local ToggleFrame = Instance.new("Frame")
+    ToggleFrame.Size = UDim2.new(1, -30, 0, 45)
+    ToggleFrame.Position = UDim2.new(0, 15, 0, yPos)
+    ToggleFrame.BackgroundTransparency = 1
+    ToggleFrame.Parent = parent
+    
+    local Label = Instance.new("TextLabel")
+    Label.Text = text
+    Label.Size = UDim2.new(0.7, 0, 1, 0)
+    Label.Position = UDim2.new(0, 0, 0, 0)
+    Label.BackgroundTransparency = 1
+    Label.TextColor3 = ThemeColors.Text
+    Label.TextSize = 14
+    Label.Font = Enum.Font.Gotham
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.Parent = ToggleFrame
+    
+    local ToggleButton = Instance.new("TextButton")
+    ToggleButton.Text = defaultState and "ON" or "OFF"
+    ToggleButton.Size = UDim2.new(0, 80, 0, 30)
+    ToggleButton.Position = UDim2.new(1, -80, 0.5, -15)
+    ToggleButton.BackgroundColor3 = defaultState and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(60, 70, 90)
+    ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleButton.TextSize = 12
+    ToggleButton.Font = Enum.Font.GothamBold
+    ToggleButton.AutoButtonColor = false
+    
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0.2, 0)
+    Corner.Parent = ToggleButton
+    ToggleButton.Parent = ToggleFrame
+    
+    local state = defaultState or false
+    ToggleButton.MouseButton1Click:Connect(function()
+        state = not state
+        ToggleButton.Text = state and "ON" or "OFF"
+        ToggleButton.BackgroundColor3 = state and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(60, 70, 90)
+        callback(state)
+    end)
+    
+    setupButtonHover(ToggleButton, ToggleButton.BackgroundColor3, Color3.fromRGB(80, 90, 110))
+    parent.CanvasSize = UDim2.new(0, 0, 0, yPos + 55)
+    return ToggleFrame
+end
+
+local function loadTabContent(tabName, contentFrame)
+    for _, child in pairs(contentFrame:GetChildren()) do
+        child:Destroy()
+    end
+    
+    if tabName == "MAIN" then
+        createButton(contentFrame, "🔄 REFRESH CHARACTER", function()
+            if LocalPlayer.Character then
+                LocalPlayer.Character:BreakJoints()
+            end
+        end)
+        
+        createButton(contentFrame, "❤️ HEAL SELF", function()
+            if LocalPlayer.Character then
+                local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+                if humanoid then
+                    humanoid.Health = humanoid.MaxHealth
+                end
+            end
+        end)
+        
+        createToggle(contentFrame, "🛡️ GOD MODE", function(state)
+            Features.GodMode = state
+            if LocalPlayer.Character then
+                local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+                if humanoid then
+                    if state then
+                        humanoid.MaxHealth = math.huge
+                        humanoid.Health = math.huge
+                    else
+                        humanoid.MaxHealth = 100
+                        humanoid.Health = 100
+                    end
+                end
+            end
+        end, false)
+        
+        createToggle(contentFrame, "👻 INVISIBLE", function(state)
+            Features.Invisible = state
+            if LocalPlayer.Character then
+                for _, part in pairs(LocalPlayer.Character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        part.Transparency = state and 1 or 0
+                    end
+                end
+            end
+        end, false)
+        
+        createToggle(contentFrame, "🚀 FLY MODE", function(state)
+            Features.Fly = state
+            toggleFly()
+        end, false)
+        
+        createToggle(contentFrame, "⚡ SPEED HACK", function(state)
+            Features.Speed = state
+        end, false)
+        
+        createToggle(contentFrame, "🔄 INFINITE JUMP", function(state)
+            Features.InfJump = state
+        end, false)
+        
+        createToggle(contentFrame, "🌀 NO CLIP", function(state)
+            Features.NoClip = state
+        end, false)
+        
+    elseif tabName == "VISUALS" then
+        createToggle(contentFrame, "💡 FULLBRIGHT", function(state)
+            Features.Fullbright = state
+            if game.Lighting then
+                game.Lighting.GlobalShadows = not state
+                if state then
+                    game.Lighting.FogEnd = 100000
+                    game.Lighting.Brightness = 2
+                else
+                    game.Lighting.FogEnd = 1000
+                    game.Lighting.Brightness = 1
+                end
+            end
+        end, false)
+        
+        createToggle(contentFrame, "🔦 X-RAY VISION", function(state)
+            Features.Xray = state
+        end, false)
+        
+        createToggle(contentFrame, "👤 PLAYER ESP", function(state)
+            Features.Esp = state
+        end, false)
+        
+        createButton(contentFrame, "☀️ DAY TIME", function()
+            if game.Lighting then
+                game.Lighting.ClockTime = 14
+            end
+        end)
+        
+        createButton(contentFrame, "🌙 NIGHT TIME", function()
+            if game.Lighting then
+                game.Lighting.ClockTime = 0
+            end
+        end)
+        
+        createButton(contentFrame, "🌈 RAINBOW MODE", function()
+            spawn(function()
+                while wait(0.1) do
+                    if game.Lighting then
+                        game.Lighting.OutdoorAmbient = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
+                    end
+                end
+            end)
+        end)
+        
+        createButton(contentFrame, "🌀 REMOVE FOG", function()
+            if game.Lighting then
+                game.Lighting.FogEnd = 100000
+            end
+        end)
+        
+    elseif tabName == "SETTINGS" then
+        createButton(contentFrame, "🔄 RELOAD GUI", function()
+            loadTabContent(tabName, contentFrame)
+        end)
+        
+        createToggle(contentFrame, "🔒 LOCK GUI POSITION", function(state)
+        end, false)
+        
+        createButton(contentFrame, "🔼 MOVE GUI UP", function()
+            MainFrame.Position = UDim2.new(0.5, -375, 0.1, 0)
+        end)
+        
+        createButton(contentFrame, "🔽 MOVE GUI DOWN", function()
+            MainFrame.Position = UDim2.new(0.5, -375, 0.5, -300)
+        end)
+        
+        createButton(contentFrame, "📏 CHANGE SIZE", function()
+            MainFrame.Size = UDim2.new(0, 800, 0, 650)
+            MainFrame.Position = UDim2.new(0.5, -400, 0.5, -325)
+        end)
+        
+        createButton(contentFrame, "❌ DESTROY GUI", function()
+            MainGui:Destroy()
+        end)
+    end
+end
+
+if tabList[1] then
+    loadTabContent(tabList[1].Name, Tabs[tabList[1].Name].Content)
+end
+
+UserInputService.JumpRequest:Connect(function()
+    if Features.InfJump and LocalPlayer.Character then
+        local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+local flyBodyVelocity = nil
+local flyBodyGyro = nil
+
+local function toggleFly()
+    if Features.Fly then
+        local char = LocalPlayer.Character
+        if char then
+            local humanoidRootPart = char:FindFirstChild("HumanoidRootPart")
+            if humanoidRootPart then
+                if not flyBodyVelocity then
+                    flyBodyVelocity = Instance.new("BodyVelocity")
+                    flyBodyVelocity.MaxForce = Vector3.new(40000, 40000, 40000)
+                    flyBodyVelocity.Velocity = Vector3.new(0, 0, 0)
+                    flyBodyVelocity.Parent = humanoidRootPart
+                    
+                    flyBodyGyro = Instance.new("BodyGyro")
+                    flyBodyGyro.MaxTorque = Vector3.new(40000, 40000, 40000)
+                    flyBodyGyro.P = 1000
+                    flyBodyGyro.D = 50
+                    flyBodyGyro.Parent = humanoidRootPart
+                end
+                
+                local flySpeed = 50
+                RunService.RenderStepped:Connect(function()
+                    if Features.Fly and flyBodyVelocity then
+                        local cam = workspace.CurrentCamera
+                        local lookVector = cam.CFrame.LookVector
+                        local rightVector = cam.CFrame.RightVector
+                        
+                        local velocity = Vector3.new(0, 0, 0)
+                        
+                        if UserInputService:IsKeyDown(Enum.KeyCode.W) then velocity = velocity + lookVector end
+                        if UserInputService:IsKeyDown(Enum.KeyCode.S) then velocity = velocity - lookVector end
+                        if UserInputService:IsKeyDown(Enum.KeyCode.D) then velocity = velocity + rightVector end
+                        if UserInputService:IsKeyDown(Enum.KeyCode.A) then velocity = velocity - rightVector end
+                        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then velocity = velocity + Vector3.new(0, 1, 0) end
+                        if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then velocity = velocity - Vector3.new(0, 1, 0) end
+                        
+                        if velocity.Magnitude > 0 then velocity = velocity.Unit * flySpeed end
+                        
+                        flyBodyVelocity.Velocity = velocity
+                        flyBodyGyro.CFrame = cam.CFrame
+                    end
+                end)
+            end
+        end
+    else
+        if flyBodyVelocity then flyBodyVelocity:Destroy() flyBodyVelocity = nil end
+        if flyBodyGyro then flyBodyGyro:Destroy() flyBodyGyro = nil end
+    end
+end
+
+toggleFly()
+
+local originalWalkSpeed = 16
+RunService.RenderStepped:Connect(function()
+    local char = LocalPlayer.Character
+    if char and Features.Speed then
+        local humanoid = char:FindFirstChild("Humanoid")
+        if humanoid then humanoid.WalkSpeed = 50 end
+    elseif char then
+        local humanoid = char:FindFirstChild("Humanoid")
+        if humanoid then humanoid.WalkSpeed = originalWalkSpeed end
+    end
+end)
+
+RunService.Stepped:Connect(function()
+    local char = LocalPlayer.Character
+    if char and Features.NoClip then
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then part.CanCollide = false end
+        end
+    end
+end)
+
+local originalTransparency = {}
+RunService.RenderStepped:Connect(function()
+    if Features.Xray then
+        for _, part in pairs(workspace:GetDescendants()) do
+            if part:IsA("BasePart") and part.Transparency < 0.5 then
+                if not originalTransparency[part] then originalTransparency[part] = part.Transparency end
+                part.Transparency = 0.5
+                part.Material = Enum.Material.ForceField
+            end
+        end
+    else
+        for part, transparency in pairs(originalTransparency) do
+            if part.Parent then part.Transparency = transparency part.Material = Enum.Material.Plastic end
+        end
+        originalTransparency = {}
+    end
+end)
+
+print("Cry0xene Hub Loaded!")
+print("GUI Visible - Press RightControl to hide/show")PlayerListGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 PlayerListGui.DisplayOrder = 998
 PlayerListGui.Enabled = false
 PlayerListGui.Parent = game:GetService("CoreGui") or LocalPlayer:WaitForChild("PlayerGui")
